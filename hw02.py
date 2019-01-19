@@ -78,3 +78,14 @@ for i in numbers:
 print('Введенная цифра встречается в введенной последовательности чисел ', total, ' раз.')
 
 # 9. Среди натуральных чисел, которые были введены, найти наибольшее по сумме цифр. Вывести на экран это число и сумму его цифр.
+numbers = input('Введите через запятую произвольное количество чисел: ').split(',')
+max_number = 0
+max_total = 0
+for i in numbers:
+    total = 0
+    for j in i:
+        total += int(j)
+    if total > max_total:
+        max_number = int(i)
+        max_total = total
+print('Число {} наибольшее по сумме цифр {}.'.format(max_number, max_total))
