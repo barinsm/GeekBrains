@@ -52,7 +52,21 @@ print('Исходный массив: ', array)
 print('Максимальный отрицательный элемент в массиве: {}, его позиция в массиве: {}'.format(result, array.index(result)))
 
 # 6. В одномерном массиве найти сумму элементов, находящихся между минимальным и максимальным элементами. Сами минимальный и максимальный элементы в сумму не включать.
-
+import random
+array = [random.randint(-100, 100) for _ in range(100)]
+print('Исходный массив: ', array)
+minimum = min(array)
+maximum = max(array)
+ind_min = array.index(minimum)
+ind_max = array.index(maximum)
+total = 0
+if ind_min < ind_max:
+    for i in range(ind_min + 1, ind_max):
+        total += array[i]
+else:
+    for i in range(ind_max + 1, ind_min):
+        total += array[i]
+print('Сумма элементов, находящихся между минимальным {} и максимальным {} элементами, равна: {}'.format(minimum, maximum, total))
 
 # 7. В одномерном массиве целых чисел определить два наименьших элемента. Они могут быть как равны между собой (оба являться минимальными), так и различаться.
 
