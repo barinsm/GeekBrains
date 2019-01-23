@@ -97,4 +97,18 @@ for i in matrix:
     print(i)
 
 # 9. Найти максимальный элемент среди минимальных элементов столбцов матрицы.
-
+import random
+x = 5
+y = 4
+matrix = [[random.randint(1, 100) for i in range(x)] for j in range(y)]
+minimum_in_column = []
+for i in range(x):
+    column = []
+    for j in range(y):
+        column.append(matrix[j][i])
+    minimum_in_column.append(min(column))
+print('Исходный массив: ')
+for i in matrix:
+    print(i)
+print('Минимальные элементы в столбцах:\n', minimum_in_column)
+print('Максимальный элемент среди них: ',max(minimum_in_column))
