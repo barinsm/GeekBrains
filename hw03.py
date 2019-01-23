@@ -25,7 +25,17 @@ print('Результирующий массив: ', result)
 # в результирующем массиве указаны индексы с началом нумерации от 0 
 
 # 3. В массиве случайных целых чисел поменять местами минимальный и максимальный элементы.
-
+import random
+array = [random.randint(0, 100) for _ in range(10)]
+print('Исходный массив: ', array)
+minimum = min(array)
+maximum = max(array)
+ind_min = array.index(minimum)
+ind_max = array.index(maximum)
+array[ind_min], array[ind_max] = maximum, minimum
+print('Результирующий массив: ', array)
+print('Поменяны местами минимальный {} и максимальный элементы {} в позициях {} и {}'.format(minimum, maximum, ind_min, ind_max))
+# в результирующем массиве поменяны местами минимальный и максимальный элементы, указаны индексы с началом нумерации от 0
 
 # 4. Определить, какое число в массиве встречается чаще всего.
 
