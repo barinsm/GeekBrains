@@ -45,5 +45,62 @@ print(timeit.timeit('recursion(n)', setup='from __main__ import n,recursion', nu
 #2. Написать два алгоритма нахождения i-го по счёту простого числа.
 #Без использования «Решета Эратосфена»;
 #Используя алгоритм «Решето Эратосфена»
+import timeit
+
+# Вариант 1 (простой)
+def simple(i):
+    count = 1
+    n = 2
+    while count <= i:
+        t = 1
+        is_simple = True
+        while t <= n:
+            if n % t == 0 and t != 1 and t != n:
+                is_simple = False
+                break
+            t += 1
+        if is_simple:
+            if count == i:
+                break
+            count += 1
+        n += 1
+    return n
+
+# Вариант 2 (решето Эратосфена)
+def eratosfen(i):
+    n = 2
+    l = 10000
+    sieve = [x for x in range(l)]
+    sieve[1] = 0
+    while n < l:
+        if sieve[n] != 0:
+            m = n*2
+            while m < l:
+                sieve[m] = 0
+                m += n
+        n += 1
+    return [p for p in sieve if p != 0][i-1]
+
+i = int(input('Введите порядковый номер искомого простого числа:'))    
+# print(simple(i))
+# print(eratosfen(i))
+print(timeit.timeit("simple(i)", setup="from __main__ import simple,i", number=100))
+print(timeit.timeit("eratosfen(i)", setup="from __main__ import eratosfen,i", number=100))
+
+"""
+Время работы алгоритмов для поиска 10-го простого числа 100 раз:
+- простой - 0.002
+- решето - 0.391
+Время работы алгоритмов для поиска 100-го простого числа 100 раз:
+- простой - 0.257
+- решето - 0.384
+Время работы алгоритмов для поиска 1000-го простого числа 100 раз:
+- простой - 43.141
+- решето - 0.430
+Алгоритм решета Эратосфена эффективен для поиска простого числа с большим порядковым номером.
+Сложность простого алгоритма O(n^2)
+Сложность решета Эратосфена O(n log(log n))
+"""
+
 #Примечание ко всему домашнему заданию: Проанализировать скорость и сложность алгоритмов. Результаты анализа сохранить в виде комментариев в файле с кодом.
 
