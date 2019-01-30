@@ -21,5 +21,17 @@ for i in companies_dict:
         print(i, companies_dict[i])
 
 #2. Написать программу сложения и умножения двух шестнадцатеричных чисел. При этом каждое число представляется как массив, элементы которого это цифры числа. Например, пользователь ввёл A2 и C4F. Сохранить их как [‘A’, ‘2’] и [‘C’, ‘4’, ‘F’] соответственно. Сумма чисел из примера: [‘C’, ‘F’, ‘1’], произведение - [‘7’, ‘C’, ‘9’, ‘F’, ‘E’].
+import collections
+import functools
+hex_numbers = collections.defaultdict(list)
+hex_numbers[1] = list(input('Введите 1-е шестнадцатиричное число: '))
+hex_numbers[2] = list(input('Введите 2-е шестнадцатиричное число: '))
+int_sum = sum([int(''.join(i), 16) for i in hex_numbers.values()])
+int_mul = functools.reduce(lambda a, b: a * b, [int(''.join(i), 16) for i in hex_numbers.values()])
+hex_numbers[3] = list(hex(int_sum))[2:]
+hex_numbers[4] = list(hex(int_mul))[2:]
+print('Сумма: ', ''.join(hex_numbers[3]))
+print("Произведение: ", ''.join(hex_numbers[4]))
+# print(hex_numbers)
 
 #Примечание: для решения задач попробуйте применить какую-нибудь коллекцию из модуля collections
