@@ -81,4 +81,24 @@ print(ordered_list)
 
 
 # 3. Массив размером 2m + 1, где m – натуральное число, заполнен случайным образом. Найдите в массиве медиану. Медианой называется элемент ряда, делящий его на две равные части: в одной находятся элементы, которые не меньше медианы, в другой – не больше медианы. Задачу можно решить без сортировки исходного массива. Но если это слишком сложно, то используйте метод сортировки, который не рассматривался на уроках
+import random
+
+def median(array, m : int):
+    if len(array) == 1:
+        return array[0]
+    i = random.randrange(len(array))
+    less = [x for x in array if x < array[i]]
+    more = [x for x in array if x > array[i]]
+    if m < len(less):
+        return median(less, m)
+    elif m >= len(array) - len(more):
+        return median(more, m - (len(array) - len(more)))
+    else:
+        return array[i]
+
+m = 5
+size = 2 * m + 1
+orig_list = [random.randint(0, 100) for _ in range(size)]
+print(orig_list)
+print(median(orig_list, m))
 
