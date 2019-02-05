@@ -1,5 +1,6 @@
 # Урок 7. Алгоритмы сортировки
 
+
 # 1. Отсортируйте по убыванию методом "пузырька" одномерный целочисленный массив, заданный случайными числами на промежутке [-100; 100]. Выведите на экран исходный и отсортированный массивы. Сортировка должна быть реализована в виде функции. По возможности доработайте алгоритм (сделайте его умнее).
 import random
 import timeit
@@ -44,7 +45,39 @@ print(timeit.timeit('bubble_sort_2(orig_list[:])', setup = 'from __main__ import
 
 # Прирост скорости процентов 15-20% у варианта 2 по отношению к варианту 1
 
+
 # 2. Отсортируйте по возрастанию методом слияния одномерный вещественный массив, заданный случайными числами на промежутке [0; 50]. Выведите на экран исходный и отсортированный массивы.
+import random
+
+def merge(left, right):
+    result = []
+    while len(left) > 0 and len(right) > 0:
+        if left[0] <= right[0]:
+            result.append(left.pop(0))
+        else:
+            result.append(right.pop(0))
+    if len(left) > 0:
+        result.extend(left)
+    if len(right) > 0:
+        result.extend(right)
+    return result
+
+def merge_sort(sublist):
+    if len(sublist) <= 1:
+        return sublist
+    else:
+        middle = len(sublist) // 2
+        left = sublist[:middle]
+        right = sublist[middle:]
+        left = merge_sort(left)
+        right = merge_sort(right)
+        result = merge(left, right)
+        return result
+
+orig_list = [random.random()*50 for _ in range(10)]
+ordered_list = merge_sort(orig_list[:])
+print(orig_list)
+print(ordered_list)
 
 
 # 3. Массив размером 2m + 1, где m – натуральное число, заполнен случайным образом. Найдите в массиве медиану. Медианой называется элемент ряда, делящий его на две равные части: в одной находятся элементы, которые не меньше медианы, в другой – не больше медианы. Задачу можно решить без сортировки исходного массива. Но если это слишком сложно, то используйте метод сортировки, который не рассматривался на уроках
