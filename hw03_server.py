@@ -1,44 +1,71 @@
 # coding: utf-8
 
-import yaml
 import socket
+import yaml
+import json
 from argparse import ArgumentParser
+from datetime import datetime
+from functools import reduce
 
-'''
-Описываем конфигурацию по умолчанию
-'''
+INSTALLED_APPS = [
+#    'echo',
+#    'serverdate'
+] 
+
+def validate_request(request):
+    if 'action' in request and 'time' in request:
+        return True
+    return False
+
+def make_response(request, code, data=None):
+    return {
+        'action': request.get('action'),
+        'time': datetime.now().timestamp(),
+        'code': code,
+        'data': data
+    } 
+
+def get_server_action():
+    applications = reduce(
+        lambda value, item: value + [__import__(f'{item}.routes')],
+        INSTALLED_APPS,
+        []
+    )
+    routes = reduce(
+        lambda value, item: value + [getattr(item, 'routes', None)],
+        applications,
+        []
+    )
+    return reduce(
+        lambda value, item: value + getattr(item, 'actionmapping', None),
+        routes,
+        []
+    )
+
+def resolve(action):
+    actionmapping = {
+        item.get('action'): item.get('controller')
+        for item in get_server_action()
+        if item
+    }
+    return actionmapping.get(action)
+
+
 config = {
     'host': '127.0.0.1',
     'port': 8000,
     'buffersize': 1024
 }
 
-'''
-Создаём объект парсера аргументов командной строки
-'''
 parser = ArgumentParser()
 
-'''
-Добавляем аргументы для парсинга
-Перечень допустимых аргументов конфигурации аргумента командной строки можно найти здесь:
-https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.add_argument
-'''
 parser.add_argument(
     '-c', '--config', type=str, required=False,
     help='Sets config file path'
 )
 
-'''
-Создаем пространство имён args на основе аргументов командной строки
-https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.parse_args
-'''
 args = parser.parse_args()
 
-'''
-Обновляем конфигурацию на основе словаря
-Подробнее о словарях python можно узнать здесь:
-https://docs.python.org/3/tutorial/datastructures.html#dictionaries
-'''
 if args.config:
     with open(args.config) as file:
         file_config = yaml.safe_load(file)
@@ -46,55 +73,53 @@ if args.config:
 
 host, port = config.get('host'), config.get('port')
 
-'''
-Код в теле данной конструкции будет выполнен только в случае запуска данного модуля
-python server.py [-c]
-'''
 if __name__ == '__main__':
     try:
-        '''
-        Создаём сокет
-        https://docs.python.org/3/library/socket.html#socket.socket
-        '''
         sock = socket.socket()
-        '''
-        Связываем сервер с его IP
-        Если адрес уже занят метод bind вызовет ошибку
-        '''
         sock.bind((host, port))
-        '''
-        Переводим сокет в режим ожидания 
-        '''
         sock.listen(5)
 
         print(f'Server started with {host}:{port}')
 
         while True:
-            '''
-            Устанавливаем подключение с клиентом
-            '''
             client, address = sock.accept()
             client_host, client_port = address
             print(f'Client was detected {client_host}:{client_port}')
 
-            '''
-            Принимаем запрос клиента
-            '''
             bytes_request = client.recv(config.get('buffersize'))
-            print(f'Client send message {bytes_request.decode()}')
+
+            request = json.loads(
+                bytes_request.decode()
+            )
+
+            if validate_request(request):
+                action = request.get('action')
+                controller = resolve(action)
+                if controller:
+                    try:
+                        response = controller(request)
+                        print(f'Client {host}:{port} send request {request}')
+                    except Exception as err:
+                        response = response = make_response(
+                            request, 500, f'Internal server error'
+                        )
+                        print(f'Exception - {err}')
+                else:
+                    response = response = make_response(
+                        request, 404, f'Action {action} is not supported'
+                    )
+                    print(f'Client {host}:{port} call action with name {action}')
+            else:
+                response = make_response(
+                    request, 400, 'Wrong request'
+                )
+                print(f'Client {host}:{port} send wrong request {request}')
+
+            string_response = json.dumps(response)
+
+            client.send(string_response.encode())
             
-            '''
-            Отправляем ответ клиенту
-            '''
-            client.send(bytes_request)
-            '''
-            Закрываем клиентский сокет
-            '''
             client.close()
     except KeyboardInterrupt:
-        '''
-        В случае нажатия сочетания клавиш Ctrl+C(Ctrl+Backspace на windows)
-        обрабатываем завершение работы сервера
-        '''
         print('Server shutdown')
 
